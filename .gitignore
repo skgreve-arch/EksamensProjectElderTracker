@@ -1,0 +1,87 @@
+# Node / Nest build artifacts
+/node_modules
+/dist
+/build
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+logs/
+
+# Test coverage
+/coverage
+/.nyc_output
+
+# Environment files
+.env
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VS Code workspace settings (keep project settings and launch config)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Runtime and temporary files
+.temp
+.tmp
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins-dependencies
+.pub/
+.flutter-plugins
+.packages
+**/doc/api/
+**/ios/Flutter/.last_build_id
+/build/
+
+# Flutter mobile platform artifacts
+android/local.properties
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Generated app symbol and mapping files
+app.*.symbols
+app.*.map.json
+
+# Miscellaneous
+*.class
+*.pyc
+*.swp
+.atom/
+.build/
+.buildlog/
+.history/
+.svn/
+.swiftpm/
+migrate_working_dir/
