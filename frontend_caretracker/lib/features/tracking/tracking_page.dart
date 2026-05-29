@@ -22,7 +22,7 @@ class _TrackingPageState extends State<TrackingPage> {
 
     socketService.connect();
 
-    socketService.socket.on('gps', (data) {
+    /*socketService.socket.on('gps', (data) {
 
       print(data);
 
@@ -31,7 +31,7 @@ class _TrackingPageState extends State<TrackingPage> {
         data['lon'],
       );
 
-    });
+    });*/
   }
 
   void addPoint(double lat, double lon) {

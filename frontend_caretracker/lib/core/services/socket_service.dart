@@ -1,31 +1,51 @@
-import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'dart:convert';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
-class SocketService {
-  late io.Socket socket;
+class SocketService 
+{
+  late WebSocketChannel channel;
 
-  void connect() {
-    socket = io.io(
-      'http://localhost:5000/',
-      io.OptionBuilder()
-          .setTransports(['websocket'])
-          .build(),
+  void connect() 
+  {
+    channel = WebSocketChannel.connect(
+      Uri.parse('ws://YOUR_SERVER_IP:5000'),
     );
 
-    socket.onConnect((_) {
-      print('Connected to backend');
-    });
+    // Identify as dashboard after connecting
+    channel.sink.add(json.encode({
+      'event': 'identify',
+      'data': {'clientType': 'dashboard'},
+    }));
 
-    socket.on('gps', (data) {
-      print('data');
-    });
+    // Listen for incoming messages
+    channel.stream.listen(
+      (message) 
+      {
+        final data = json.decode(message);
+        final event = data['event'];
+        final payload = data['data'];
 
-    socket.onDisconnect((_) {
-      print('Disconnected');
-    });
+        print('EVENT: $event');
+        print('DATA: $payload');
 
-    socket.onAny((event, data) {
-      print('EVENT: $event');
-      print('DATA: $data');
-    });
+        if (event == 'alarm') 
+        {
+          onAlarm(payload);
+        }
+      },
+      onDone: () => print('Disconnected'),
+      onError: (error) => print('Error: $error'),
+    );
+  }
+
+  void onAlarm(dynamic data) 
+  {
+    print('ALARM from tracker ${data['Tracker_ID']} at ${data['Timestamp']}');
+    // trigger your popup here
+  }
+
+  void dispose() 
+  {
+    channel.sink.close();
   }
 }
