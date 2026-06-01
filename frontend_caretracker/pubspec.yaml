@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    web_socket_channel: ^3.0.3
+  web_socket_channel: ^3.0.3
 
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
