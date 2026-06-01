@@ -9,7 +9,7 @@ class SocketService
   void connect() 
   {
     _channel = WebSocketChannel.connect(
-      Uri.parse('ws://YOUR_SERVER_IP:5000'),
+      Uri.parse('ws://10.176.69.104:5000'),
     );
 
     // Identify as dashboard after connecting
