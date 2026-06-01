@@ -51,7 +51,7 @@ class ApiService {
   {
     try
     {
-      final response = await http.get(Uri.parse('\$baseUrl/residents/tracker/\$trackerId'));
+      final response = await http.get(Uri.parse('$baseUrl/residents/tracker/$trackerId'));
       if (response.statusCode == 200) 
       {
         return json.decode(response.body) as Map<String, dynamic>?;
@@ -60,7 +60,7 @@ class ApiService {
     }
     catch (e) 
     {
-      print('Error fetching resident for tracker \$trackerId: \$e');
+      print('Error fetching resident for tracker $trackerId: $e');
       return null;
     }
   }
