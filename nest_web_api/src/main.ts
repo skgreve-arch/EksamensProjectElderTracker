@@ -5,6 +5,7 @@ import { TrackersService } from './trackers/trackers.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.useWebSocketAdapter(new WsAdapter(app));
 
   app.enableCors({
