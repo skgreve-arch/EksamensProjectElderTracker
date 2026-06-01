@@ -28,6 +28,15 @@ class ApiService {
     throw Exception('Failed to load trackers: \\$uri (status: \\${res.statusCode})');
   }
 
+  Future<Map<String, dynamic>> getHealth() async {
+    final uri = Uri.parse('$baseUrl/health');
+    final res = await http.get(uri);
+    if (res.statusCode == 200) {
+      return json.decode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Failed to fetch health: status \\${res.statusCode}');
+  }
+
   Future<List<dynamic>> getUnassignedTrackers() async {
     final uri = Uri.parse('\$baseUrl/trackers/unassigned');
     final res = await http.get(uri);
