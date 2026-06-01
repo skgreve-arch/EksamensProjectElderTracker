@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/socket_provider.dart';
 
-class AlarmPopup extends StatelessWidget 
+class AlarmPopup 
 {
-  const AlarmPopup({super.key});
-
-  void _showAlarmDialog(BuildContext context, Map<String, dynamic> alarm) 
+  static void show(BuildContext context) 
   {
     showDialog(
       context: context,
@@ -73,31 +71,6 @@ class AlarmPopup extends StatelessWidget
           );
         },
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) 
-  {
-    return Consumer<SocketProvider>(
-      builder: (context, socketProvider, child) 
-      {
-        // Show popup whenever a new alarm comes in
-        if (socketProvider.latestAlarm != null) 
-        {
-          WidgetsBinding.instance.addPostFrameCallback((_) 
-          {
-            _showAlarmDialog(context, socketProvider.latestAlarm!);
-          });
-        }
-
-        return Scaffold(
-          appBar: AppBar(title: const Text('Senior Tracker Dashboard')),
-          body: const Center(
-            child: Text('Dashboard'),
-          ),
-        );
-      },
     );
   }
 }
