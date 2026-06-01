@@ -3,34 +3,34 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SocketService 
 {
-  late WebSocketChannel channel;
+  late WebSocketChannel _channel;
+  Function(dynamic data)? onAlarm;
 
   void connect() 
   {
-    channel = WebSocketChannel.connect(
+    _channel = WebSocketChannel.connect(
       Uri.parse('ws://YOUR_SERVER_IP:5000'),
     );
 
     // Identify as dashboard after connecting
-    channel.sink.add(json.encode({
+    _channel.sink.add(json.encode({
       'event': 'identify',
       'data': {'clientType': 'dashboard'},
     }));
 
     // Listen for incoming messages
-    channel.stream.listen(
+    _channel.stream.listen(
       (message) 
       {
         final data = json.decode(message);
         final event = data['event'];
         final payload = data['data'];
 
-        print('EVENT: $event');
-        print('DATA: $payload');
+        print('EVENT: $event - Data: $payload');
 
-        if (event == 'alarm') 
+        if (event == 'alarm' && onAlarm != null) 
         {
-          onAlarm(payload);
+          onAlarm!(payload);
         }
       },
       onDone: () => print('Disconnected'),
@@ -38,14 +38,8 @@ class SocketService
     );
   }
 
-  void onAlarm(dynamic data) 
-  {
-    print('ALARM from tracker ${data['Tracker_ID']} at ${data['Timestamp']}');
-    // trigger your popup here
-  }
-
   void dispose() 
   {
-    channel.sink.close();
+    _channel.sink.close();
   }
 }
