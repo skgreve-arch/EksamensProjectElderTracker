@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/socket_provider.dart';
-import 'features/tracking/tracking_page.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(
@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
 
-      home: const TrackingPage(),
+      
+      home: const HomePage(),
     );
   }
 }

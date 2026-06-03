@@ -275,7 +275,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                   polygons: [
                                     Polygon(
                                       points: _geoFenceCorners,
-                                      color: Colors.blue.withOpacity(0.15),
+                                      color: Colors.blue.withValues(alpha: 0.15),
                                       borderColor: Colors.blueAccent,
                                       borderStrokeWidth: 3,
                                     ),
