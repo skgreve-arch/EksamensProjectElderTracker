@@ -28,6 +28,15 @@ class ApiService {
     throw Exception('Failed to load trackers: \\$uri (status: \\${res.statusCode})');
   }
 
+  Future<Map<String, dynamic>> getHealth() async {
+    final uri = Uri.parse('$baseUrl/health');
+    final res = await http.get(uri);
+    if (res.statusCode == 200) {
+      return json.decode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Failed to fetch health: status \\${res.statusCode}');
+  }
+
   Future<List<dynamic>> getUnassignedTrackers() async {
     final uri = Uri.parse('\$baseUrl/trackers/unassigned');
     final res = await http.get(uri);
@@ -45,5 +54,23 @@ class ApiService {
     }
     if (res.statusCode == 204) return null;
     throw Exception('Failed to load latest GPS for tracker \$trackerId');
+  }
+
+  Future<Map<String, dynamic>?> getResidentByTracker(int trackerId) async
+  {
+    try
+    {
+      final response = await http.get(Uri.parse('$baseUrl/residents/tracker/$trackerId'));
+      if (response.statusCode == 200) 
+      {
+        return json.decode(response.body) as Map<String, dynamic>?;
+      }
+      return null;
+    }
+    catch (e) 
+    {
+      print('Error fetching resident for tracker $trackerId: $e');
+      return null;
+    }
   }
 }
