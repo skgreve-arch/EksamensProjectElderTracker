@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/socket_provider.dart';
-import 'features/reporting/reporting_page.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       ),
 
       
-      home: const ReportingPage(),
+      home: const HomePage(),
     );
   }
 }
