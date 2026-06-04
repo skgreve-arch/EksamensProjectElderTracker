@@ -110,13 +110,23 @@ class PiConnection:
         self.connected = False
 
     def send_gps(self, lat, lon):
+        if not self.connected or not self.tracker_id:
+            print("Not ready to send GPS - not connected or identified yet")
+            return
         self._send('gps', {'lat': lat, 'lng': lon})
 
     def send_alarm(self):
+        if not self.connected or not self.tracker_id:
+            print("Not ready to send alarm - not connected or identified yet")
+            return
         self._send('alarm', {})
 
     def send_battery(self, battery_level):
+        if not self.connected or not self.tracker_id:
+            print("Not ready to send battery - not connected or identified yet")
+            return
         self._send('battery', {'battery': battery_level})
+
 
     def connect(self):
         while not self._stop_event.is_set():
