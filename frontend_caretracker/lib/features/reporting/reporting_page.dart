@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../shared/models/report.dart';
 import 'report_detail_page.dart';
 import 'create_report_page.dart';
+import '../../core/services/api_service.dart';
 
 class ReportingPage extends StatefulWidget {
   const ReportingPage({super.key});
@@ -13,6 +14,51 @@ class ReportingPage extends StatefulWidget {
 
 class _ReportingPageState extends State<ReportingPage> {
   final List<Report> reports = [];
+  final ApiService api = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    loadReports();
+  }
+
+  Future<void> loadReports() async {
+
+  final data = await api.getReports();
+
+  setState(() {
+
+    reports.clear();
+
+    for (final item in data) {
+
+      reports.add(
+        Report(
+          id: item['ID'].toString(),
+
+          title: item['Title'] ?? '',
+
+          residentName:
+              item['resident']?['Name'] ?? '',
+
+          trackerId:
+              item['resident']?['Tracker_ID']
+                  ?.toString() ??
+              '',
+
+          author:
+              item['respondedBy']?['Name'] ?? '',
+
+          description:
+              item['Description'] ?? '',
+
+          createdAt:
+              DateTime.parse(item['Date']),
+        ),
+      );
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +83,7 @@ class _ReportingPageState extends State<ReportingPage> {
                   trackerId: result["trackerId"],
                   author: result["author"],
                   description: result["description"],
-                  
+
                   createdAt: DateTime.now(),
                 ),
               );
@@ -63,7 +109,7 @@ class _ReportingPageState extends State<ReportingPage> {
                         children: const [
                           Text("Total Alerts"),
                           SizedBox(height: 10),
-                          Text("127", style: TextStyle(fontSize: 24)),
+                          Text("", style: TextStyle(fontSize: 24)),
                         ],
                       ),
                     ),
@@ -78,7 +124,7 @@ class _ReportingPageState extends State<ReportingPage> {
                         children: const [
                           Text("Avg Response"),
                           SizedBox(height: 10),
-                          Text("3m 42s", style: TextStyle(fontSize: 24)),
+                          Text("", style: TextStyle(fontSize: 24)),
                         ],
                       ),
                     ),

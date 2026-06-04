@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/socket_provider.dart';
-import 'home_page.dart';
+import 'features/auth/login_page.dart';
 
 void main() {
   runApp(
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       ),
 
       
-      home: const HomePage(),
+      home: const LoginPage(),
     );
   }
 }

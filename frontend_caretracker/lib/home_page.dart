@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'features/tracking/tracking_page.dart';
 import 'features/reporting/reporting_page.dart';
+import 'providers/socket_provider.dart';
+import 'features/alarm/alarm_popup.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,53 +14,53 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   int selectedIndex = 0;
 
-  final pages = const [
-    TrackingPage(),
-    ReportingPage(),
-  ];
+  final pages = const [TrackingPage(), ReportingPage()];
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<SocketProvider>(
+      builder: (context, provider, child) {
+        if (provider.latestAlarm != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            AlarmPopup.show(context);
+          });
+        }
+        return Scaffold(
+          body: Row(
+            children: [
+              NavigationRail(
+                selectedIndex: selectedIndex,
 
-    return Scaffold(
-      body: Row(
-        children: [
+                onDestinationSelected: (index) {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                },
 
-          NavigationRail(
-            selectedIndex: selectedIndex,
+                labelType: NavigationRailLabelType.all,
 
-            onDestinationSelected: (index) {
-              setState(() {
-                selectedIndex = index;
-              });
-            },
+                destinations: const [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.location_on),
+                    label: Text('Tracking'),
+                  ),
 
-            labelType: NavigationRailLabelType.all,
-
-            destinations: const [
-
-              NavigationRailDestination(
-                icon: Icon(Icons.location_on),
-                label: Text('Tracking'),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.description),
+                    label: Text('Reports'),
+                  ),
+                ],
               ),
 
-              NavigationRailDestination(
-                icon: Icon(Icons.description),
-                label: Text('Reports'),
-              ),
+              const VerticalDivider(width: 1),
+
+              Expanded(child: pages[selectedIndex]),
             ],
           ),
-
-          const VerticalDivider(width: 1),
-
-          Expanded(
-            child: pages[selectedIndex],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
