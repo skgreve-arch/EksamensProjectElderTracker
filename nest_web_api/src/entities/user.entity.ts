@@ -14,10 +14,10 @@ export class User {
   Name: string;
 
   @Column()
-  Password: string;
+  PasswordHash: string;
 
-  @Column({ nullable: true })
-  Hash: string;
+  @Column()
+  PasswordSalt: string;
 
   @ManyToOne(() => Role, role => role.users)
   @JoinColumn({ name: 'Role_ID' })

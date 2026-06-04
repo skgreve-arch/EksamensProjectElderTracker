@@ -3,9 +3,15 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Role } from '../entities/role.entity';
+import * as bcrypt from 'bcrypt';
 
-const mockUserRepository = 
-{
+jest.mock('bcrypt', () => ({
+  genSalt: jest.fn(),
+  hash: jest.fn(),
+  compare: jest.fn(),
+}));
+
+const mockUserRepository = {
   create: jest.fn(),
   save: jest.fn(),
   find: jest.fn(),
@@ -14,8 +20,7 @@ const mockUserRepository =
   delete: jest.fn(),
 };
 
-const mockRoleRepository = 
-{
+const mockRoleRepository = {
   create: jest.fn(),
   save: jest.fn(),
   find: jest.fn(),
@@ -50,27 +55,47 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  // User tests
   describe('createUser', () => {
-    it('should create and save a user with a role', async () => {
-      const dto = { Email: 'test@test.com', Name: 'Test User', Password: 'password', Role_ID: 1 };
+    it('should hash password and create a user with a role', async () => {
+      const dto = { Email: 'test@test.com', Name: 'Test User', Password: 'plainpassword', Role_ID: 1 };
       const role = { Role_ID: 1, Role: 'Admin' };
-      const created = { User_ID: 1, ...dto, role };
+      const created = {
+        User_ID: 1,
+        Email: dto.Email,
+        Name: dto.Name,
+        PasswordHash: 'hashedpassword',
+        PasswordSalt: 'salt',
+        role,
+      };
 
-      mockRoleRepository.findOne.mockResolvedValue(role); // findOneRole still hits the repo
+      mockRoleRepository.findOne.mockResolvedValue(role);
       mockUserRepository.create.mockReturnValue(created);
       mockUserRepository.save.mockResolvedValue(created);
+      (bcrypt.genSalt as jest.Mock).mockResolvedValue('salt');
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashedpassword');
 
       const result = await service.createUser(dto);
 
-      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({
-        where: { Role_ID: dto.Role_ID },
-      });
+      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({ where: { Role_ID: 1 } });
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
+      expect(bcrypt.hash).toHaveBeenCalledWith('plainpassword', 'salt');
       expect(mockUserRepository.create).toHaveBeenCalledWith({
-        ...dto,
+        Email: dto.Email,
+        Name: dto.Name,
+        PasswordHash: 'hashedpassword',
+        PasswordSalt: 'salt',
         role,
       });
+      expect(mockUserRepository.save).toHaveBeenCalledWith(created);
       expect(result).toEqual(created);
+    });
+
+    it('should throw error if role not found', async () => {
+      const dto = { Email: 'test@test.com', Name: 'Test User', Password: 'plainpassword', Role_ID: 999 };
+      mockRoleRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.createUser(dto)).rejects.toThrow('Role with ID 999 not found');
+      expect(mockUserRepository.create).not.toHaveBeenCalled();
     });
   });
 
@@ -121,7 +146,7 @@ describe('UsersService', () => {
   });
 
   describe('updateUser', () => {
-    it('should update and return the user', async () => {
+    it('should update user without changing password', async () => {
       const dto = { Name: 'Updated Name' };
       const updated = { User_ID: 1, Email: 'test@test.com', Name: 'Updated Name', role: { Role_ID: 1, Role: 'Admin' } };
 
@@ -130,7 +155,37 @@ describe('UsersService', () => {
 
       const result = await service.updateUser(1, dto);
 
-      expect(mockUserRepository.update).toHaveBeenCalledWith(1, dto);
+      expect(mockUserRepository.update).toHaveBeenCalledWith(1, {
+        Email: undefined,
+        Name: 'Updated Name',
+      });
+      expect(result).toEqual(updated);
+    });
+
+    it('should rehash password when updating password', async () => {
+      const dto = { Password: 'newpassword' };
+      const updated = {
+        User_ID: 1,
+        Email: 'test@test.com',
+        PasswordHash: 'newhashedpassword',
+        PasswordSalt: 'newsalt',
+      };
+
+      (bcrypt.genSalt as jest.Mock).mockResolvedValue('newsalt');
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newhashedpassword');
+      mockUserRepository.update.mockResolvedValue({ affected: 1 });
+      mockUserRepository.findOne.mockResolvedValue(updated);
+
+      const result = await service.updateUser(1, dto);
+
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(10);
+      expect(bcrypt.hash).toHaveBeenCalledWith('newpassword', 'newsalt');
+      expect(mockUserRepository.update).toHaveBeenCalledWith(1, {
+        Email: undefined,
+        Name: undefined,
+        PasswordHash: 'newhashedpassword',
+        PasswordSalt: 'newsalt',
+      });
       expect(result).toEqual(updated);
     });
   });
@@ -145,7 +200,51 @@ describe('UsersService', () => {
     });
   });
 
-  // Role tests
+  describe('login', () => {
+    it('should return user if email and password match', async () => {
+      const user = {
+        User_ID: 1,
+        Email: 'test@test.com',
+        PasswordHash: 'hashedpassword',
+        role: { Role_ID: 1, Role: 'Admin' },
+      };
+      mockUserRepository.findOne.mockResolvedValue(user);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await service.login('test@test.com', 'plainpassword');
+
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { Email: 'test@test.com' },
+        relations: ['role'],
+      });
+      expect(bcrypt.compare).toHaveBeenCalledWith('plainpassword', 'hashedpassword');
+      expect(result).toEqual(user);
+    });
+
+    it('should return null if user not found', async () => {
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.login('wrong@test.com', 'plainpassword');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null if password does not match', async () => {
+      const user = {
+        User_ID: 1,
+        Email: 'test@test.com',
+        PasswordHash: 'hashedpassword',
+      };
+      mockUserRepository.findOne.mockResolvedValue(user);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      const result = await service.login('test@test.com', 'wrongpassword');
+
+      expect(bcrypt.compare).toHaveBeenCalledWith('wrongpassword', 'hashedpassword');
+      expect(result).toBeNull();
+    });
+  });
+
   describe('createRole', () => {
     it('should create and save a role', async () => {
       const dto = { Role: 'Admin' };
