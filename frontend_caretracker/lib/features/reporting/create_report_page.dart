@@ -15,7 +15,6 @@ class _CreateReportPageState extends State<CreateReportPage> {
   final responseTimeController = TextEditingController();
   final descriptionController = TextEditingController();
   final residentController = TextEditingController();
-  final trackerController = TextEditingController();
   final ApiService api = ApiService();
   List<dynamic> residents = [];
   dynamic selectedResident;
@@ -88,16 +87,6 @@ class _CreateReportPageState extends State<CreateReportPage> {
               },
             ),
 
-            const SizedBox(height: 15),
-
-            TextFormField(
-              initialValue:
-                  selectedResident?['tracker']?['Tracker_ID']?.toString() ?? '',
-
-              readOnly: true,
-
-              decoration: const InputDecoration(labelText: 'Tracker ID'),
-            ),
             const SizedBox(height: 15),
 
             TextField(

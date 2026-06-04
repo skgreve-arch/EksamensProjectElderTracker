@@ -44,10 +44,6 @@ class ReportDetailPage extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            Text("Tracker ID: ${report.trackerId}"),
-
-            const SizedBox(height: 10),
-
             Text(report.description),
           ],
         ),

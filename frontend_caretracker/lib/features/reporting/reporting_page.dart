@@ -41,11 +41,6 @@ class _ReportingPageState extends State<ReportingPage> {
           residentName:
               item['resident']?['Name'] ?? '',
 
-          trackerId:
-              item['resident']?['Tracker_ID']
-                  ?.toString() ??
-              '',
-
           author:
               item['respondedBy']?['Name'] ?? '',
 
@@ -80,7 +75,6 @@ class _ReportingPageState extends State<ReportingPage> {
 
                   title: result["title"],
                   residentName: result["residentName"],
-                  trackerId: result["trackerId"],
                   author: result["author"],
                   description: result["description"],
 
