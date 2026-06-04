@@ -53,15 +53,6 @@ class _CreateReportPageState extends State<CreateReportPage> {
             const SizedBox(height: 15),
 
             TextField(
-              controller: responseTimeController,
-              decoration: const InputDecoration(
-                labelText: "Response Time (seconds)",
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            TextField(
               controller: descriptionController,
               maxLines: 5,
               decoration: const InputDecoration(labelText: "Description"),
@@ -78,8 +69,6 @@ class _CreateReportPageState extends State<CreateReportPage> {
                   "author": authorController.text,
                   "residentName": residentController.text,
                   "trackerId": trackerController.text,
-                  "responseTime":
-                      int.tryParse(responseTimeController.text) ?? 0,
                   "description": descriptionController.text,
                 });
               },

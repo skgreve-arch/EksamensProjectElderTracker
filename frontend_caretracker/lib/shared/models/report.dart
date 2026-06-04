@@ -6,7 +6,6 @@ class Report {
   final String author;
   final String description;
   final DateTime createdAt;
-  final int responseTime;
 
   Report({
     required this.id,
@@ -16,6 +15,5 @@ class Report {
     required this.author,
     required this.description,
     required this.createdAt,
-    required this.responseTime,
   });
 }

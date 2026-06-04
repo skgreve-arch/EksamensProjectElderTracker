@@ -21,7 +21,7 @@ class _ReportingPageState extends State<ReportingPage> {
       trackerId: "2",
       description: "Resident activated emergency button.",
       createdAt: DateTime.now(),
-      responseTime: 120,
+      
     ),
     Report(
       id: "2",
@@ -31,7 +31,7 @@ class _ReportingPageState extends State<ReportingPage> {
       trackerId: "1",
       description: "Resident needed assistance.",
       createdAt: DateTime.now(),
-      responseTime: 90,
+     
     ),
   ];
 
@@ -58,7 +58,7 @@ class _ReportingPageState extends State<ReportingPage> {
                   trackerId: result["trackerId"],
                   author: result["author"],
                   description: result["description"],
-                  responseTime: result["responseTime"],
+                  
                   createdAt: DateTime.now(),
                 ),
               );

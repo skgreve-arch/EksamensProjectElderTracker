@@ -29,10 +29,6 @@ class ReportDetailPage extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            Text("Response Time: ${report.responseTime} sec"),
-
-            const SizedBox(height: 10),
-
             Text("Date: ${report.createdAt}"),
 
             const SizedBox(height: 20),
