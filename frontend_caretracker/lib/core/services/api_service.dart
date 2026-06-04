@@ -20,7 +20,7 @@ class ApiService {
   }
 
   Future<List<dynamic>> getTrackers() async {
-    final uri = Uri.parse('\$baseUrl/trackers');
+    final uri = Uri.parse('$baseUrl/trackers');
     final res = await http.get(uri);
     if (res.statusCode == 200) {
       return json.decode(res.body) as List<dynamic>;
@@ -38,7 +38,7 @@ class ApiService {
   }
 
   Future<List<dynamic>> getUnassignedTrackers() async {
-    final uri = Uri.parse('\$baseUrl/trackers/unassigned');
+    final uri = Uri.parse('$baseUrl/trackers/unassigned');
     final res = await http.get(uri);
     if (res.statusCode == 200) {
       return json.decode(res.body) as List<dynamic>;
@@ -47,7 +47,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>?> getGpsLatest(int trackerId) async {
-    final uri = Uri.parse('\$baseUrl/gps/\$trackerId/latest');
+    final uri = Uri.parse('$baseUrl/gps/$trackerId/latest');
     final res = await http.get(uri);
     if (res.statusCode == 200) {
       return json.decode(res.body) as Map<String, dynamic>?;

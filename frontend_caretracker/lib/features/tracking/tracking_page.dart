@@ -25,17 +25,20 @@ class _TrackingPageState extends State<TrackingPage> {
   bool isLoadingTrackers = false;
   String? trackerLoadError;
 
-  final Map<int, GpsPoint> trackerPositions = {};
-  final List<int> trackerIds = [];
-  int? selectedTrackerId;
-  LatLng mapCenter = const LatLng(55.6761, 12.5683);
-
   static const List<LatLng> _geoFenceCorners = [
     LatLng(54.911618, 9.788300), // NW
     LatLng(54.911883, 9.789362), // NE
     LatLng(54.911487, 9.789637), // SE
     LatLng(54.911256, 9.788590), // SW
   ];
+
+  static const LatLng _geoFenceCenter = LatLng(54.911561, 9.788972);
+
+  final MapController _mapController = MapController();
+  final Map<int, GpsPoint> trackerPositions = {};
+  final List<int> trackerIds = [];
+  int? selectedTrackerId;
+  LatLng mapCenter = _geoFenceCenter;
 
   Timer? pollingTimer;
 
@@ -120,6 +123,9 @@ class _TrackingPageState extends State<TrackingPage> {
         );
         mapCenter = LatLng(latitude, longitude);
       });
+      if (mounted) {
+        _mapController.move(mapCenter, 2);
+      }
     } catch (error) {
       debugPrint('Failed to fetch GPS for tracker $trackerId: $error');
     }
@@ -262,9 +268,10 @@ class _TrackingPageState extends State<TrackingPage> {
                             ),
                             clipBehavior: Clip.hardEdge,
                             child: FlutterMap(
+                              mapController: _mapController,
                               options: MapOptions(
                                 initialCenter: mapCenter,
-                                initialZoom: selectedPosition == null ? 5 : 16,
+                                initialZoom: selectedPosition == null ? 18 : 23,
                               ),
                               children: [
                                 TileLayer(
