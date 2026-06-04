@@ -12,28 +12,7 @@ class ReportingPage extends StatefulWidget {
 }
 
 class _ReportingPageState extends State<ReportingPage> {
-  final List<Report> reports = [
-    Report(
-      id: "1",
-      title: "Incident Report #001",
-      author: "Mikkel",
-      residentName: "Lars",
-      trackerId: "2",
-      description: "Resident activated emergency button.",
-      createdAt: DateTime.now(),
-      
-    ),
-    Report(
-      id: "2",
-      title: "Incident Report #002",
-      author: "Anna",
-      residentName: "Hans",
-      trackerId: "1",
-      description: "Resident needed assistance.",
-      createdAt: DateTime.now(),
-     
-    ),
-  ];
+  final List<Report> reports = [];
 
   @override
   Widget build(BuildContext context) {
