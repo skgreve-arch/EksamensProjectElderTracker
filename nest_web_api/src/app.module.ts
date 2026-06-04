@@ -17,6 +17,7 @@ import { Role } from './entities/role.entity';
 import { WebsocketModule } from './websocket/websocket.module';
 import { IncidentReport } from './entities/incident.entity';
 import { AlarmModule } from './alarm/alarm.module';
+import { IncidentModule } from './incident/incident.module';
 
 @Module({
   imports: [
@@ -43,7 +44,10 @@ import { AlarmModule } from './alarm/alarm.module';
     TrackersModule, 
     ResidentsModule, 
     UsersModule, 
-    WebsocketModule, AlarmModule, ],
+    WebsocketModule, 
+    AlarmModule, 
+    IncidentModule, 
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

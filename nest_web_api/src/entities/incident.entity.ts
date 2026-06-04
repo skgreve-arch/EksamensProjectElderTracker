@@ -12,6 +12,9 @@ export class IncidentReport
   @JoinColumn({ name: 'Resident_ID' })
   resident: Resident;
 
+  @Column({ nullable: false })
+  Title: string;
+
   @CreateDateColumn()
   Date: Date;
 
