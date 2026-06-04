@@ -12,7 +12,7 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-  ) {}
+  ) { }
 
   // User CRUD
   /**
@@ -20,12 +20,10 @@ export class UsersService {
    * @param dto 
    * @returns A promise resolving to the created User entity.
    */
-  async createUser(dto: CreateUserDto): Promise<User> 
-  {
+  async createUser(dto: CreateUserDto): Promise<User> {
     // Validate role exists
     const role = await this.findOneRole(dto.Role_ID);
-    if (!role) 
-    {
+    if (!role) {
       throw new Error(`Role with ID ${dto.Role_ID} not found`);
     }
     // Create user entity and save to database
@@ -40,8 +38,7 @@ export class UsersService {
    * Retrieves all users from the database.
    * @returns A promise resolving to an array of User entities.
    */
-  async findAllUsers(): Promise<User[]> 
-  {
+  async findAllUsers(): Promise<User[]> {
     return this.userRepository.find({
       relations: ['role'],
     });
@@ -52,8 +49,7 @@ export class UsersService {
    * @param userId 
    * @returns A promise resolving to a User entity or null if not found.
    */
-  async findOneUser(userId: number): Promise<User | null> 
-  {
+  async findOneUser(userId: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { User_ID: userId },
       relations: ['role'],
@@ -66,8 +62,7 @@ export class UsersService {
    * @param dto 
    * @returns A promise resolving to the updated User entity or null if not found.
    */
-  async updateUser(userId: number, dto: UpdateUserDto): Promise<User | null> 
-  {
+  async updateUser(userId: number, dto: UpdateUserDto): Promise<User | null> {
     await this.userRepository.update(userId, dto);
     return this.findOneUser(userId);
   }
@@ -76,8 +71,7 @@ export class UsersService {
    * Removes a user from the database.
    * @param userId 
    */
-  async removeUser(userId: number): Promise<void> 
-  {
+  async removeUser(userId: number): Promise<void> {
     await this.userRepository.delete(userId);
   }
 
@@ -87,8 +81,7 @@ export class UsersService {
    * @param dto 
    * @returns A promise resolving to the created Role entity.
    */
-  async createRole(dto: CreateRoleDto): Promise<Role> 
-  {
+  async createRole(dto: CreateRoleDto): Promise<Role> {
     const role = this.roleRepository.create(dto);
     return this.roleRepository.save(role);
   }
@@ -97,8 +90,7 @@ export class UsersService {
    * Retrieves all roles from the database.
    * @returns A promise resolving to an array of Role entities.
    */
-  async findAllRoles(): Promise<Role[]> 
-  {
+  async findAllRoles(): Promise<Role[]> {
     return this.roleRepository.find();
   }
 
@@ -107,8 +99,7 @@ export class UsersService {
    * @param roleId 
    * @returns A promise resolving to a Role entity or null if not found.
    */
-  async findOneRole(roleId: number): Promise<Role | null> 
-  {
+  async findOneRole(roleId: number): Promise<Role | null> {
     return this.roleRepository.findOne({
       where: { Role_ID: roleId },
     });
@@ -118,8 +109,20 @@ export class UsersService {
    * Removes a role from the database.
    * @param roleId 
    */
-  async removeRole(roleId: number): Promise<void> 
-  {
+  async removeRole(roleId: number): Promise<void> {
     await this.roleRepository.delete(roleId);
+  }
+  async login(
+    email: string,
+    password: string,
+  ): Promise<User | null> {
+
+    return this.userRepository.findOne({
+      where: {
+        Email: email,
+        Password: password,
+      },
+      relations: ['role'],
+    });
   }
 }

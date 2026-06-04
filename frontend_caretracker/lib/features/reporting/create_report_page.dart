@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/services/api_service.dart';
+import '../../shared/current_user.dart';
 
 class CreateReportPage extends StatefulWidget {
   const CreateReportPage({super.key});
@@ -14,6 +16,31 @@ class _CreateReportPageState extends State<CreateReportPage> {
   final descriptionController = TextEditingController();
   final residentController = TextEditingController();
   final trackerController = TextEditingController();
+  final ApiService api = ApiService();
+  List<dynamic> residents = [];
+  dynamic selectedResident;
+
+  @override
+  void initState() {
+    super.initState();
+    loadResidents();
+  }
+
+  Future<void> loadResidents() async {
+    try {
+      final data = await api.getResidents();
+
+      setState(() {
+        residents = data;
+
+        if (residents.isNotEmpty) {
+          selectedResident = residents.first;
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,23 +59,44 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
             const SizedBox(height: 15),
 
-            TextField(
-              controller: authorController,
-              decoration: const InputDecoration(labelText: "Author"),
+            TextFormField(
+              initialValue: CurrentUser.name ?? '',
+
+              readOnly: true,
+
+              decoration: const InputDecoration(labelText: 'Author'),
             ),
 
             const SizedBox(height: 15),
 
-            TextField(
-              controller: residentController,
-              decoration: const InputDecoration(labelText: "Resident")
+            DropdownButtonFormField<dynamic>(
+              value: selectedResident,
+
+              decoration: const InputDecoration(labelText: 'Resident'),
+
+              items: residents.map((resident) {
+                return DropdownMenuItem(
+                  value: resident,
+                  child: Text(resident['Name']),
+                );
+              }).toList(),
+
+              onChanged: (value) {
+                setState(() {
+                  selectedResident = value;
+                });
+              },
             ),
 
             const SizedBox(height: 15),
 
-            TextField(
-              controller: trackerController,
-              decoration: const InputDecoration(labelText: "Tracker"),
+            TextFormField(
+              initialValue:
+                  selectedResident?['tracker']?['Tracker_ID']?.toString() ?? '',
+
+              readOnly: true,
+
+              decoration: const InputDecoration(labelText: 'Tracker ID'),
             ),
             const SizedBox(height: 15),
 
@@ -59,18 +107,23 @@ class _CreateReportPageState extends State<CreateReportPage> {
             ),
 
             const SizedBox(height: 30),
-            
-            
 
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  "title": titleController.text,
-                  "author": authorController.text,
-                  "residentName": residentController.text,
-                  "trackerId": trackerController.text,
-                  "description": descriptionController.text,
-                });
+              onPressed: () async {
+                try {
+                  await api.createReport(
+                    residentId: selectedResident['Resident_ID'],
+                    userId: CurrentUser.userId!,
+                    title: titleController.text,
+                    description: descriptionController.text,
+                  );
+
+                  print('Report created');
+
+                  Navigator.pop(context);
+                } catch (e) {
+                  print('ERROR: $e');
+                }
               },
               child: const Text("Save Report"),
             ),

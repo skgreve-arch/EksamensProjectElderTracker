@@ -25,7 +25,9 @@ class ApiService {
     if (res.statusCode == 200) {
       return json.decode(res.body) as List<dynamic>;
     }
-    throw Exception('Failed to load trackers: \\$uri (status: \\${res.statusCode})');
+    throw Exception(
+      'Failed to load trackers: \\$uri (status: \\${res.statusCode})',
+    );
   }
 
   Future<Map<String, dynamic>> getHealth() async {
@@ -56,21 +58,87 @@ class ApiService {
     throw Exception('Failed to load latest GPS for tracker \$trackerId');
   }
 
-  Future<Map<String, dynamic>?> getResidentByTracker(int trackerId) async
-  {
-    try
-    {
-      final response = await http.get(Uri.parse('$baseUrl/residents/tracker/$trackerId'));
-      if (response.statusCode == 200) 
-      {
+  Future<Map<String, dynamic>?> getResidentByTracker(int trackerId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/residents/tracker/$trackerId'),
+      );
+      if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>?;
       }
       return null;
-    }
-    catch (e) 
-    {
+    } catch (e) {
       print('Error fetching resident for tracker $trackerId: $e');
       return null;
     }
+  }
+
+  Future<List<dynamic>> getReports() async {
+    final uri = Uri.parse('$baseUrl/incident');
+
+    final res = await http.get(uri);
+
+    if (res.statusCode == 200) {
+      return json.decode(res.body);
+    }
+
+    throw Exception('Failed to load reports');
+  }
+
+  Future<void> createReport({
+    required int residentId,
+    required int userId,
+    required String title,
+    required String description,
+  }) async {
+    final uri = Uri.parse('$baseUrl/incident');
+
+    final res = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'Resident_ID': residentId,
+        'User_ID': userId,
+        'Title': title,
+        'Description': description,
+      }),
+    );
+
+    print('STATUS: ${res.statusCode}');
+    print('BODY: ${res.body}');
+
+    if (res.statusCode != 201 && res.statusCode != 200) {
+      throw Exception(
+        'Failed to create report (${res.statusCode}) ${res.body}',
+      );
+    }
+  }
+
+  Future<List<dynamic>> getResidents() async {
+    final uri = Uri.parse('$baseUrl/residents');
+
+    final res = await http.get(uri);
+
+    if (res.statusCode == 200) {
+      return json.decode(res.body);
+    }
+
+    throw Exception('Failed to load residents');
+  }
+
+  Future<Map<String, dynamic>?> login(String email, String password) async {
+    final uri = Uri.parse('$baseUrl/users/login');
+
+    final res = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': email, 'password': password}),
+    );
+
+    if (res.statusCode == 201 || res.statusCode == 200) {
+      return json.decode(res.body);
+    }
+
+    return null;
   }
 }
