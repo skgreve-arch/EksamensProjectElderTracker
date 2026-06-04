@@ -33,6 +33,8 @@ class _TrackingPageState extends State<TrackingPage> {
   ];
 
   static const LatLng _geoFenceCenter = LatLng(54.911561, 9.788972);
+  static const double _initialZoom = 18;
+  static const double _selectedZoom = 23;
 
   final MapController _mapController = MapController();
   final Map<int, GpsPoint> trackerPositions = {};
@@ -121,14 +123,26 @@ class _TrackingPageState extends State<TrackingPage> {
           lat: latitude,
           lon: longitude,
         );
-        mapCenter = LatLng(latitude, longitude);
       });
-      if (mounted) {
-        _mapController.move(mapCenter, 2);
-      }
     } catch (error) {
       debugPrint('Failed to fetch GPS for tracker $trackerId: $error');
     }
+  }
+
+  void _recenterMap() {
+    final selectedPosition = selectedTrackerId != null
+        ? trackerPositions[selectedTrackerId!]
+        : null;
+
+    if (selectedPosition != null) {
+      _mapController.move(
+        LatLng(selectedPosition.lat, selectedPosition.lon),
+        _selectedZoom,
+      );
+      return;
+    }
+
+    _mapController.move(_geoFenceCenter, _initialZoom);
   }
 
   bool _isInsideGeoFence(LatLng point) {
@@ -254,6 +268,15 @@ class _TrackingPageState extends State<TrackingPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton.icon(
+                      onPressed: _recenterMap,
+                      icon: const Icon(Icons.my_location),
+                      label: const Text('Recenter'),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   Expanded(
                     child: Column(
@@ -271,7 +294,7 @@ class _TrackingPageState extends State<TrackingPage> {
                               mapController: _mapController,
                               options: MapOptions(
                                 initialCenter: mapCenter,
-                                initialZoom: selectedPosition == null ? 18 : 23,
+                                initialZoom: _initialZoom,
                               ),
                               children: [
                                 TileLayer(
