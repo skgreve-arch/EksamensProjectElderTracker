@@ -15,6 +15,11 @@ const mockUsersService =
   removeRole: jest.fn(),
 };
 
+/**
+ * Unit tests for `UsersController` ensuring correct routing and that the
+ * controller delegates operations to `UsersService` without embedding
+ * business logic.
+ */
 describe('UsersController', () => {
   let controller: UsersController;
 

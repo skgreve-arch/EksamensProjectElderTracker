@@ -5,8 +5,8 @@ import { Resident } from '../entities/resident.entity';
 import { TrackersService } from '../trackers/trackers.service';
 import { BadRequestException } from '@nestjs/common';
 
-const mockResidentRepository = 
-{
+// Mock repository and trackers service used throughout the tests.
+const mockResidentRepository = {
   create: jest.fn(),
   save: jest.fn(),
   find: jest.fn(),
@@ -15,11 +15,14 @@ const mockResidentRepository =
   delete: jest.fn(),
 };
 
-const mockTrackersService = 
-{
+const mockTrackersService = {
   findOne: jest.fn(),
 };
 
+/**
+ * Unit tests for `ResidentsService` verifying create, read, update,
+ * delete, and lookup by tracker behaviors.
+ */
 describe('ResidentsService', () => {
   let service: ResidentsService;
 

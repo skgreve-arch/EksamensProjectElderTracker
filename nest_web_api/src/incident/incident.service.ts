@@ -4,21 +4,26 @@ import { Repository } from 'typeorm';
 import { IncidentReport } from '../entities/incident.entity';
 import { CreateIncidentReportDto, UpdateIncidentReportDto } from '../dto/incident.dto';
 
+/**
+ * Service handling CRUD operations for incident reports.
+ *
+ * The service uses a TypeORM repository to create, read, update,
+ * and delete `IncidentReport` entities and returns entities with
+ * relations loaded where appropriate (resident, respondedBy).
+ */
 @Injectable()
-export class IncidentService 
-{
+export class IncidentService {
   constructor(
     @InjectRepository(IncidentReport)
     private readonly incidentRepository: Repository<IncidentReport>,
   ) {}
 
   /**
-   * Creates a new incident report based on the provided DTO. The report will be associated with the specified resident and user, and will include the title and optional description. The created report is then saved to the database and returned.
-   * @param dto The data transfer object containing the information needed to create the incident report, including Resident_ID, User_ID, Title, and an optional Description.
-   * @returns The newly created and saved incident report entity.
+   * Create and persist a new incident report.
+   * The DTO must include `Resident_ID` and `User_ID` (responder),
+   * and may include `Title` and `Description`.
    */
-  async create(dto: CreateIncidentReportDto): Promise<IncidentReport> 
-  {
+  async create(dto: CreateIncidentReportDto): Promise<IncidentReport> {
     const report = this.incidentRepository.create({
       resident: { Resident_ID: dto.Resident_ID },
       respondedBy: { User_ID: dto.User_ID },
@@ -29,11 +34,10 @@ export class IncidentService
   }
 
   /**
-   * Finds all incident reports, including related resident and user information, ordered by date descending.
-   * @returns An array of all incident reports with their related resident and user data, ordered by date from newest to oldest.
+   * Return all incident reports with related resident and responder,
+   * ordered by date (newest first).
    */
-  async findAll(): Promise<IncidentReport[]> 
-  {
+  async findAll(): Promise<IncidentReport[]> {
     return this.incidentRepository.find({
       relations: ['resident', 'respondedBy'],
       order: { Date: 'DESC' },
@@ -41,12 +45,9 @@ export class IncidentService
   }
 
   /**
-   * Finds a single incident report by its ID.
-   * @param id 
-   * @returns The incident report with the given ID, or null if not found.
+   * Find one incident report by its primary key. Returns `null` if not found.
    */
-  async findOne(id: number): Promise<IncidentReport | null> 
-  {
+  async findOne(id: number): Promise<IncidentReport | null> {
     return this.incidentRepository.findOne({
       where: { ID: id },
       relations: ['resident', 'respondedBy'],
@@ -54,12 +55,9 @@ export class IncidentService
   }
 
   /**
-   * Finds all incident reports associated with a specific resident.
-   * @param residentId 
-   * @returns An array of incident reports for the given resident, ordered by date descending. If no reports are found, returns an empty array.
+   * Find all incident reports for a specific resident.
    */
-  async findByResident(residentId: number): Promise<IncidentReport[]> 
-  {
+  async findByResident(residentId: number): Promise<IncidentReport[]> {
     return this.incidentRepository.find({
       where: { resident: { Resident_ID: residentId } },
       relations: ['resident', 'respondedBy'],
@@ -68,13 +66,10 @@ export class IncidentService
   }
 
   /**
-   * Updates the title, description, and/or respondedBy of an incident report. Only provided fields will be updated.
-   * @param id 
-   * @param dto 
-   * @returns The updated incident report, or null if not found.
+   * Update provided fields of an incident report. `respondedBy` is only
+   * updated when `User_ID` is present in the DTO.
    */
-  async update(id: number, dto: UpdateIncidentReportDto): Promise<IncidentReport | null> 
-  {
+  async update(id: number, dto: UpdateIncidentReportDto): Promise<IncidentReport | null> {
     await this.incidentRepository.update(id, {
       Title: dto.Title,
       Description: dto.Description,
@@ -84,11 +79,9 @@ export class IncidentService
   }
 
   /**
-   * Removes an incident report by its ID.
-   * @param id 
+   * Delete an incident report by ID.
    */
-  async remove(id: number): Promise<void> 
-  {
+  async remove(id: number): Promise<void> {
     await this.incidentRepository.delete(id);
   }
 }

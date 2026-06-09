@@ -4,6 +4,10 @@ import { CreateUserDto, UpdateUserDto, CreateRoleDto } from '../dto/user.dto';
 import { User } from '../entities/user.entity';
 import { Role } from '../entities/role.entity';
 
+/**
+ * Controller exposing user and role management endpoints. Delegates
+ * validation and persistence to `UsersService`.
+ */
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
@@ -64,6 +68,8 @@ export class UsersController {
   removeRole(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.removeRole(id);
   }
+
+  // POST /users/login
   @Post('login')
   login(
     @Body() body: {
@@ -71,6 +77,8 @@ export class UsersController {
       password: string;
     },
   ) {
+    // Delegate authentication to the service; controller does not expose
+    // password handling or hashing logic.
     return this.usersService.login(
       body.email,
       body.password,

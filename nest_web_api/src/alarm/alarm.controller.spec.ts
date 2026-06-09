@@ -2,11 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AlarmController } from './alarm.controller';
 import { AlarmService } from './alarm.service';
 
+// Lightweight mock of the AlarmService used by the controller.
 const mockAlarmService = {
   findAll: jest.fn(),
   findByTracker: jest.fn(),
 };
 
+/**
+ * Unit tests for `AlarmController` confirm the controller delegates to
+ * `AlarmService` and returns the expected values for each route handler.
+ */
 describe('AlarmController', () => {
   let controller: AlarmController;
 

@@ -3,6 +3,7 @@ import { IncidentService } from './incident.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { IncidentReport } from '../entities/incident.entity';
 
+// Mock repository used to simulate DB interactions for the service.
 const mockIncidentRepository = {
   create: jest.fn(),
   save: jest.fn(),
@@ -12,6 +13,10 @@ const mockIncidentRepository = {
   delete: jest.fn(),
 };
 
+/**
+ * Unit tests for `IncidentService` verify repository calls and returned values
+ * for create, read, update and delete operations.
+ */
 describe('IncidentService', () => {
   let service: IncidentService;
 

@@ -27,6 +27,7 @@ export class UsersService
     // Validate role exists
     const role = await this.findOneRole(dto.Role_ID);
     if (!role) {
+      // Prefer throwing a descriptive error; controller/tests handle this.
       throw new Error(`Role with ID ${dto.Role_ID} not found`);
     }
 

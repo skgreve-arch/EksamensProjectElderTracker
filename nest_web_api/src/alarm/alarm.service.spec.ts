@@ -3,12 +3,17 @@ import { AlarmService } from './alarm.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Alarm } from '../entities/alarm.entity';
 
+// Minimal mock repository that exposes the methods used by AlarmService.
 const mockAlarmRepository = {
   create: jest.fn(),
   save: jest.fn(),
   find: jest.fn(),
 };
 
+/**
+ * Unit tests for `AlarmService` verify the repository interactions and
+ * the returned values for `triggerAlarm`, `findAll`, and `findByTracker`.
+ */
 describe('AlarmService', () => {
   let service: AlarmService;
 
@@ -36,6 +41,7 @@ describe('AlarmService', () => {
     it('should create and save an alarm for a tracker', async () => {
       const alarm = { Alarm_ID: 1, tracker: { Tracker_ID: 1 }, Timestamp: new Date() };
 
+      // Repository returns the created entity and resolves when saved.
       mockAlarmRepository.create.mockReturnValue(alarm);
       mockAlarmRepository.save.mockResolvedValue(alarm);
 

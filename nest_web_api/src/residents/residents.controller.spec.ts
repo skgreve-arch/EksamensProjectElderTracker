@@ -11,6 +11,10 @@ const mockResidentsService = {
   remove: jest.fn(),
 };
 
+/**
+ * Controller unit tests for `ResidentsController` ensuring delegation to
+ * `ResidentsService` and expected route behavior.
+ */
 describe('ResidentsController', () => {
   let controller: ResidentsController;
 

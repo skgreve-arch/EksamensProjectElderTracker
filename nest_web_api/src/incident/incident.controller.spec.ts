@@ -11,6 +11,10 @@ const mockIncidentService = {
   remove: jest.fn(),
 };
 
+/**
+ * Unit tests for `IncidentController` ensure the controller delegates to
+ * `IncidentService` and returns expected data for each route.
+ */
 describe('IncidentController', () => {
   let controller: IncidentController;
 

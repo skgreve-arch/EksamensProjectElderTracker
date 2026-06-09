@@ -3,6 +3,7 @@ import { TrackersService } from './trackers.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Tracker } from '../entities/tracker.entity';
 
+// Mock repository used across these unit tests to avoid database access.
 const mockTrackerRepository = {
   create: jest.fn(),
   save: jest.fn(),
@@ -13,6 +14,10 @@ const mockTrackerRepository = {
   createQueryBuilder: jest.fn(),
 };
 
+/**
+ * Unit tests for `TrackersService` covering CRUD operations, online
+ * status management, battery updates, and offline detection logic.
+ */
 describe('TrackersService', () => {
   let service: TrackersService;
 

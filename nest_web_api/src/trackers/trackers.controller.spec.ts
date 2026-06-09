@@ -11,6 +11,10 @@ const mockTrackersService = {
   findUnassigned: jest.fn(),
 };
 
+/**
+ * Unit tests for `TrackersController` ensuring the controller correctly
+ * delegates calls to `TrackersService` and that routes behave as expected.
+ */
 describe('TrackersController', () => {
   let controller: TrackersController;
 

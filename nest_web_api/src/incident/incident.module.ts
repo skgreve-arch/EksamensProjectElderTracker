@@ -4,6 +4,10 @@ import { IncidentReport } from 'src/entities/incident.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { IncidentController } from './incident.controller';
 
+/**
+ * IncidentModule wires up the incident report domain: controller,
+ * service and the IncidentReport entity repository.
+ */
 @Module({
   imports: [TypeOrmModule.forFeature([IncidentReport])],
   providers: [IncidentService],

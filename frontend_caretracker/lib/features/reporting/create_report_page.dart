@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../../core/services/api_service.dart';
 import '../../shared/current_user.dart';
 
+/// Page used to create a new incident report.
+///
+/// The form fetches the resident list from the API and allows the user to
+/// enter a title and description. The author is pre-filled from
+/// [CurrentUser]. On submit the page calls [ApiService.createReport].
 class CreateReportPage extends StatefulWidget {
   const CreateReportPage({super.key});
 
@@ -10,12 +15,15 @@ class CreateReportPage extends StatefulWidget {
 }
 
 class _CreateReportPageState extends State<CreateReportPage> {
+  /// Controllers for the text inputs.
   final titleController = TextEditingController();
-  final authorController = TextEditingController();
   final responseTimeController = TextEditingController();
   final descriptionController = TextEditingController();
-  final residentController = TextEditingController();
+
+  /// API client used to load residents and submit the report.
   final ApiService api = ApiService();
+
+  /// Resident list loaded from the backend and the currently selected one.
   List<dynamic> residents = [];
   dynamic selectedResident;
 
@@ -25,6 +33,17 @@ class _CreateReportPageState extends State<CreateReportPage> {
     loadResidents();
   }
 
+  @override
+  void dispose() {
+    // Dispose controllers to free resources.
+    titleController.dispose();
+    responseTimeController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  /// Loads residents from the backend and sets an initial selection when
+  /// the list is not empty.
   Future<void> loadResidents() async {
     try {
       final data = await api.getResidents();
@@ -37,6 +56,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
         }
       });
     } catch (e) {
+      // Log and continue - UI will show empty dropdown
       print(e);
     }
   }
@@ -51,6 +71,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
         child: Column(
           children: [
+            // Title input
             TextField(
               controller: titleController,
               decoration: const InputDecoration(labelText: "Title"),
@@ -58,28 +79,25 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
             const SizedBox(height: 15),
 
+            // Author is read-only and pre-filled from CurrentUser
             TextFormField(
               initialValue: CurrentUser.name ?? '',
-
               readOnly: true,
-
               decoration: const InputDecoration(labelText: 'Author'),
             ),
 
             const SizedBox(height: 15),
 
+            // Resident selector populated from the API call
             DropdownButtonFormField<dynamic>(
               value: selectedResident,
-
               decoration: const InputDecoration(labelText: 'Resident'),
-
               items: residents.map((resident) {
                 return DropdownMenuItem(
                   value: resident,
                   child: Text(resident['Name']),
                 );
               }).toList(),
-
               onChanged: (value) {
                 setState(() {
                   selectedResident = value;
@@ -89,6 +107,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
             const SizedBox(height: 15),
 
+            // Description input
             TextField(
               controller: descriptionController,
               maxLines: 5,
@@ -99,6 +118,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
             ElevatedButton(
               onPressed: () async {
+                // Submit the filled form to the backend
                 try {
                   await api.createReport(
                     residentId: selectedResident['Resident_ID'],
@@ -111,6 +131,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
                   Navigator.pop(context);
                 } catch (e) {
+                  // Show or log error on failure
                   print('ERROR: $e');
                 }
               },

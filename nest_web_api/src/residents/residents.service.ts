@@ -5,6 +5,12 @@ import { Resident } from '../entities/resident.entity';
 import { CreateResidentDto, UpdateResidentDto } from '../dto/resident.dto';
 import { TrackersService } from '../trackers/trackers.service';
 
+/**
+ * Service managing residents and their association with trackers.
+ *
+ * Validates tracker assignments via `TrackersService` when creating or
+ * updating a resident to ensure referential integrity.
+ */
 @Injectable()
 export class ResidentsService {
   constructor(
@@ -14,18 +20,15 @@ export class ResidentsService {
   ) {}
 
   /**
-   * Creates a new resident in the database. If a Tracker_ID is provided, it validates that the tracker exists before associating it with the resident.
-   * @param dto 
-   * @returns A promise resolving to the created Resident entity, including its associated tracker if applicable.
-    * @throws BadRequestException if a Tracker_ID is provided but the tracker does not exist.
+   * Create a new resident. If `Tracker_ID` is present, verify the tracker
+   * exists before associating it to avoid dangling foreign keys.
+   *
+   * Throws `BadRequestException` when a tracker id is provided but not found.
    */
-  async create(dto: CreateResidentDto): Promise<Resident> 
-  {
-    if (dto.Tracker_ID) 
-    {
+  async create(dto: CreateResidentDto): Promise<Resident> {
+    if (dto.Tracker_ID) {
       const tracker = await this.trackersService.findOne(dto.Tracker_ID);
-      if (!tracker) 
-      {
+      if (!tracker) {
         throw new BadRequestException(`Tracker with ID ${dto.Tracker_ID} does not exist`);
       }
     }
@@ -38,23 +41,18 @@ export class ResidentsService {
   }
 
   /**
-   * Retrieves all residents from the database, including their associated trackers.
-   * @returns A promise resolving to an array of Resident entities with their trackers.
+   * Return all residents with their tracker relations loaded.
    */
-  async findAll(): Promise<Resident[]> 
-  {
+  async findAll(): Promise<Resident[]> {
     return this.residentRepository.find({
       relations: ['tracker'],
     });
   }
 
   /**
-   * Retrieves a resident by their ID, including their associated tracker.
-   * @param residentId The ID of the resident to retrieve.
-   * @returns A promise resolving to the Resident entity with their tracker, or null if not found.
+   * Find a resident by primary key, including the tracker relation.
    */
-  async findOne(residentId: number): Promise<Resident | null> 
-  {
+  async findOne(residentId: number): Promise<Resident | null> {
     return this.residentRepository.findOne({
       where: { Resident_ID: residentId },
       relations: ['tracker'],
@@ -62,13 +60,10 @@ export class ResidentsService {
   }
 
   /**
-   * Updates a resident's information in the database. If a Tracker_ID is provided in the update DTO, it validates that the tracker exists before updating the association.
-   * @param residentId The ID of the resident to update.
-   * @param dto The update DTO containing the new information.
-   * @returns A promise resolving to the updated Resident entity, or null if not found.
+   * Update a resident's properties. If `Tracker_ID` is present, it will
+   * be used to associate the resident with the tracker.
    */
-  async update(residentId: number, dto: UpdateResidentDto): Promise<Resident | null> 
-  {
+  async update(residentId: number, dto: UpdateResidentDto): Promise<Resident | null> {
     await this.residentRepository.update(residentId, {
       ...dto,
       tracker: dto.Tracker_ID ? { Tracker_ID: dto.Tracker_ID } : undefined,
@@ -77,21 +72,16 @@ export class ResidentsService {
   }
 
   /**
-   * Removes a resident from the database.
-   * @param residentId The ID of the resident to remove.
+   * Remove a resident row by ID.
    */
-  async remove(residentId: number): Promise<void> 
-  {
+  async remove(residentId: number): Promise<void> {
     await this.residentRepository.delete(residentId);
   }
 
   /**
-   * Finds a resident by their associated tracker ID.
-   * @param trackerId The ID of the tracker to search for.
-   * @returns A promise resolving to the Resident entity with the specified tracker, or null if not found.
+   * Find a resident assigned to a particular tracker.
    */
-  async findByTracker(trackerId: number): Promise<Resident | null> 
-  {
+  async findByTracker(trackerId: number): Promise<Resident | null> {
     return this.residentRepository.findOne({
       where: { tracker: { Tracker_ID: trackerId } },
       relations: ['tracker'],

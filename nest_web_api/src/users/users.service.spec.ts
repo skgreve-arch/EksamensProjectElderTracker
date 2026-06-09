@@ -28,6 +28,11 @@ const mockRoleRepository = {
   delete: jest.fn(),
 };
 
+/**
+ * Unit tests for `UsersService` covering user creation, authentication,
+ * updates, deletion and role management. Uses repository mocks to avoid
+ * touching the database during tests.
+ */
 describe('UsersService', () => {
   let service: UsersService;
 

@@ -11,6 +11,10 @@ const mockGpsRepository = {
   findOne: jest.fn(),
 };
 
+/**
+ * Unit tests for `GpsService` ensure repository methods are called with
+ * the expected arguments and the service returns repository responses.
+ */
 describe('GpsService', () => {
   let service: GpsService;
 
@@ -76,23 +80,23 @@ describe('GpsService', () => {
     });
   });
 
-    describe('get5LatestsByTracker', () => {
-      it('should return the 5 latest locations for a tracker', async () => {
-        const locations = [
-          { ID: 1, tracker: { Tracker_ID: 1 }, lat: 55.123, lng: 9.456 },
-          { ID: 2, tracker: { Tracker_ID: 1 }, lat: 55.456, lng: 9.789 },
-        ];
-        mockGpsRepository.find.mockResolvedValue(locations);
+  describe('get5LatestsByTracker', () => {
+    it('should return the 5 latest locations for a tracker', async () => {
+      const locations = [
+        { ID: 1, tracker: { Tracker_ID: 1 }, lat: 55.123, lng: 9.456 },
+        { ID: 2, tracker: { Tracker_ID: 1 }, lat: 55.456, lng: 9.789 },
+      ];
+      mockGpsRepository.find.mockResolvedValue(locations);
 
-        const result = await service.get5LatestsByTracker(1);
+      const result = await service.get5LatestsByTracker(1);
 
-        expect(mockGpsRepository.find).toHaveBeenCalledWith({
-            where: { tracker: { Tracker_ID: 1 } },
-            order: { Timestamp: 'DESC' },
-            take: 5,
-            relations: ['tracker'],
-        });
-        expect(result).toEqual(locations);
+      expect(mockGpsRepository.find).toHaveBeenCalledWith({
+        where: { tracker: { Tracker_ID: 1 } },
+        order: { Timestamp: 'DESC' },
+        take: 5,
+        relations: ['tracker'],
       });
+      expect(result).toEqual(locations);
     });
+  });
 });

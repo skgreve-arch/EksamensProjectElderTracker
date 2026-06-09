@@ -126,21 +126,19 @@ export class TrackersService
 
     for (const tracker of trackers) 
     {
-      // Never seen before
-      if (!tracker.LastSeen) 
-      {
+      // If never seen, mark offline and persist.
+      if (!tracker.LastSeen) {
         tracker.IsOnline = false;
         await this.trackerRepository.save(tracker);
         continue;
       }
 
-      // Difference in seconds
+      // Compute age in seconds since last seen and mark offline
+      // if it exceeds the configured threshold (60s).
       const diffMs = now.getTime() - new Date(tracker.LastSeen).getTime();
       const diffSeconds = diffMs / 1000;
-      
-      // Offline after 60 sec
-      if (diffSeconds > 60) 
-      {
+
+      if (diffSeconds > 60) {
         tracker.IsOnline = false;
         await this.trackerRepository.save(tracker);
       }

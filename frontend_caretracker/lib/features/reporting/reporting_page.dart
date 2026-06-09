@@ -5,6 +5,8 @@ import 'report_detail_page.dart';
 import 'create_report_page.dart';
 import '../../core/services/api_service.dart';
 
+/// Page that lists incident reports and provides quick statistics and
+/// navigation for creating or viewing reports.
 class ReportingPage extends StatefulWidget {
   const ReportingPage({super.key});
 
@@ -13,7 +15,10 @@ class ReportingPage extends StatefulWidget {
 }
 
 class _ReportingPageState extends State<ReportingPage> {
+  /// Local cache of reports displayed in the list.
   final List<Report> reports = [];
+
+  /// API client used to load reports from the backend.
   final ApiService api = ApiService();
 
   @override
@@ -22,44 +27,35 @@ class _ReportingPageState extends State<ReportingPage> {
     loadReports();
   }
 
+  /// Loads reports from the API and converts them to `Report` objects.
   Future<void> loadReports() async {
+    final data = await api.getReports();
 
-  final data = await api.getReports();
+    setState(() {
+      reports.clear();
 
-  setState(() {
-
-    reports.clear();
-
-    for (final item in data) {
-
-      reports.add(
-        Report(
-          id: item['ID'].toString(),
-
-          title: item['Title'] ?? '',
-
-          residentName:
-              item['resident']?['Name'] ?? '',
-
-          author:
-              item['respondedBy']?['Name'] ?? '',
-
-          description:
-              item['Description'] ?? '',
-
-          createdAt:
-              DateTime.parse(item['Date']),
-        ),
-      );
-    }
-  });
-}
+      for (final item in data) {
+        reports.add(
+          Report(
+            id: item['ID'].toString(),
+            title: item['Title'] ?? '',
+            // Some backend responses include nested resident/respondedBy
+            residentName: item['resident']?['Name'] ?? '',
+            author: item['respondedBy']?['Name'] ?? '',
+            description: item['Description'] ?? '',
+            createdAt: DateTime.parse(item['Date']),
+          ),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Reporting")),
 
+      // Button to create a new report; result is appended to the list
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(
@@ -72,12 +68,10 @@ class _ReportingPageState extends State<ReportingPage> {
               reports.add(
                 Report(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
-
                   title: result["title"],
                   residentName: result["residentName"],
                   author: result["author"],
                   description: result["description"],
-
                   createdAt: DateTime.now(),
                 ),
               );
@@ -93,6 +87,7 @@ class _ReportingPageState extends State<ReportingPage> {
 
         child: Column(
           children: [
+            // Top-level statistics cards (placeholders for now)
             Row(
               children: [
                 Expanded(
@@ -129,6 +124,7 @@ class _ReportingPageState extends State<ReportingPage> {
 
             const SizedBox(height: 20),
 
+            // List of reports
             Expanded(
               child: ListView.builder(
                 itemCount: reports.length,
@@ -139,13 +135,11 @@ class _ReportingPageState extends State<ReportingPage> {
                   return Card(
                     child: ListTile(
                       leading: const Icon(Icons.description),
-
                       title: Text(report.title),
-
                       subtitle: Text("Created by ${report.author}"),
-
                       trailing: ElevatedButton(
                         onPressed: () {
+                          // Navigate to the detail page for the selected report
                           Navigator.push(
                             context,
                             MaterialPageRoute(
