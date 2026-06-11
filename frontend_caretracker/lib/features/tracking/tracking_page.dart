@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:frontend_caretracker/features/alarm/alarm_popup.dart';
-import 'package:frontend_caretracker/providers/socket_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../shared/models/gps_point.dart';
