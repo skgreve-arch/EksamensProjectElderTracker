@@ -7,18 +7,21 @@ import '../../providers/socket_provider.dart';
 /// The popup reads the latest alarm and resident info from `SocketProvider`
 /// and displays a simple dialog with relevant details and an acknowledge
 /// button that clears the alarm state.
-class AlarmPopup {
+class AlarmPopup 
+{
   /// Displays the alarm dialog.
   ///
   /// `context` is required to find the [SocketProvider] and to show the
   /// dialog. The dialog is modal and cannot be dismissed by tapping outside
   /// (`barrierDismissible: false`) to force the user to acknowledge it.
-  static void show(BuildContext context) {
-    showDialog(
+  static Future<void> show(BuildContext context) 
+  {
+    return showDialog(
       context: context,
       barrierDismissible: false, // must manually dismiss
       builder: (_) => Consumer<SocketProvider>(
-        builder: (context, socketProvider, child) {
+        builder: (context, socketProvider, child) 
+        {
           // Latest raw alarm payload from the websocket provider
           final alarm = socketProvider.latestAlarm;
           // Resident details resolved for the alarm's tracker, may be null
@@ -74,7 +77,8 @@ class AlarmPopup {
             ),
             actions: [
               TextButton(
-                onPressed: () {
+                onPressed: () 
+                {
                   // Clears the current alarm in the provider and close dialog
                   socketProvider.clearAlarm();
                   Navigator.of(context).pop();

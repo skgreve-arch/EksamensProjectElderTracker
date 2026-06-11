@@ -11,14 +11,16 @@ import 'features/alarm/alarm_popup.dart';
 /// - Shows a `TrackingPage` and a `ReportingPage` in the main content area.
 /// - Listens to `SocketProvider` for incoming alarms and displays
 ///   an `AlarmPopup` when a new alarm arrives.
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget 
+{
   const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> 
+{
   /// Index of the currently selected destination in the `NavigationRail`.
   int selectedIndex = 0;
 
@@ -26,18 +28,28 @@ class _HomePageState extends State<HomePage> {
   /// Marked `const` so the widgets are canonical and not recreated.
   final pages = const [TrackingPage(), ReportingPage()];
 
+  // Flag to prevent multiple alarm dialogs from stacking if multiple alarms arrive
+  bool _isAlarmDialogShowing = false;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     // Use Consumer to rebuild when SocketProvider publishes changes
     // (e.g. when an alarm is received).
     return Consumer<SocketProvider>(
-      builder: (context, provider, child) {
+      builder: (context, provider, child) 
+      {
         // If a new alarm is present, schedule a post-frame callback
         // to show the popup. Doing it post-frame avoids showing dialogs
         // while the widget tree is still building.
-        if (provider.latestAlarm != null) {
+        if (provider.latestAlarm != null && !_isAlarmDialogShowing) 
+        {
+          _isAlarmDialogShowing = true; 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            AlarmPopup.show(context);
+            if (!mounted) return;
+            AlarmPopup.show(context).then((_) {
+              if (mounted) setState(() => _isAlarmDialogShowing = false);
+            });
           });
         }
 
